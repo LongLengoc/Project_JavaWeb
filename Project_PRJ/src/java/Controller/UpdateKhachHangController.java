@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -33,6 +34,9 @@ public class UpdateKhachHangController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try {
+            // Lay thong tin dang nhap
+            HttpSession session = request.getSession();
+            Object obj = session.getAttribute("login");
             String maKH = request.getParameter("maKH");
             Khachhang kh = new Khachhang();
             

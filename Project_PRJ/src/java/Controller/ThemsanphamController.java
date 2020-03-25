@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -33,28 +34,41 @@ public class ThemsanphamController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try {
+            // Lay thong tin dang nhap
+            HttpSession session = request.getSession();
+            Object obj = session.getAttribute("login");
+
             Product p = new Product();
+            if (obj == null) {
+                // Access denied
+                // quay lai trang login
+                request.setAttribute("AccessDenied", "Vui long dang nhap de thuc hien chuc nang nay");
+                RequestDispatcher rd = request.getRequestDispatcher("Dangnhap.jsp");
+                rd.forward(request, response);
+            } else {
+                // Access acceptd
 
-            // Them thong tin san pham vao database
-            if (request.getParameter("add") != null) {
-                //Lay thong tin san pham tu form
-                String mahang = request.getParameter("mahang");
-                String tenhang = request.getParameter("tenhang");
-                String dvt = request.getParameter("dvt");
-                String g = request.getParameter("gia");
-                int gia = Integer.parseInt(g);
-                String hinhanh = request.getParameter("hinhanh");
-                p.insert(mahang, tenhang, dvt, gia, hinhanh);
-                request.setAttribute("AddProductSuccess", "Them san pham moi thanh cong");
+                // Them thong tin san pham vao database
+                if (request.getParameter("add") != null) {
+                    //Lay thong tin san pham tu form
+                    String mahang = request.getParameter("mahang");
+                    String tenhang = request.getParameter("tenhang");
+                    String dvt = request.getParameter("dvt");
+                    String g = request.getParameter("gia");
+                    int gia = Integer.parseInt(g);
+                    String hinhanh = request.getParameter("hinhanh");
+                    p.insert(mahang, tenhang, dvt, gia, hinhanh);
+                    request.setAttribute("AddProductSuccess", "Them san pham moi thanh cong");
+                }
+
+                // Hien thi toan bo thong tin san pham
+                if (request.getParameter("show") != null) {
+                    request.setAttribute("lst", p.getListProduct());
+                }
+
+                RequestDispatcher rd = request.getRequestDispatcher("Themsanpham.jsp");
+                rd.forward(request, response);
             }
-
-            // Hien thi toan bo thong tin san pham
-            if (request.getParameter("show") != null) {
-                request.setAttribute("lst", p.getListProduct());
-            }
-
-            RequestDispatcher rd = request.getRequestDispatcher("Themsanpham.jsp");
-            rd.forward(request, response);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

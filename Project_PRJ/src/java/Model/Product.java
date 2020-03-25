@@ -163,8 +163,8 @@ public class Product {
         ps.setString(3, ngaytao);
         
         ps.executeUpdate();
-        ps.close();
-        con.close();
+        //ps.close();
+        //con.close();
     }
     
     // Them san pham vao bang tblMathang
@@ -203,5 +203,30 @@ public class Product {
         ps.execute();
         ps.close();
         con.close();
+    }
+    
+    // Tim kiem san pham bang ten
+    public ArrayList<Product> searchproduct(String tenhang) throws Exception {
+        ArrayList<Product> lstpro = new ArrayList<>();
+        
+        try {
+            stm = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            String strSelect = "Select * from tblMatHang where Tenhang like '%" + tenhang + "%'";
+            rs = stm.executeQuery(strSelect);
+
+            while (rs.next()) {
+                String code = rs.getString(1); //cot so 1
+                String name = rs.getString(2); //cot so 2
+                String unit = rs.getString(3);
+                int price = rs.getInt(4);
+                String image = rs.getString(5);
+                Product p = new Product();
+                p = new Product(code, name, unit, image, price);
+                lstpro.add(p);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return lstpro;
     }
 }

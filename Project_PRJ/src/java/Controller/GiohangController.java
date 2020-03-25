@@ -5,21 +5,26 @@
  */
 package Controller;
 
+import Model.Cart;
+import Model.Item;
 import Model.Product;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Admin
  */
-public class DathangController extends HttpServlet {
+public class GiohangController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,38 +39,74 @@ public class DathangController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try {
-            String mahang = request.getParameter("MaHang");
             Product p = new Product();
-            
-            // Lay thong tin mat hang can mua
-            request.setAttribute("mahang", p.select1(mahang));
-            
-            // Khi bam xac nhan, lay thong tin khach hang va thong tin sp
-            if (request.getParameter("xacnhan") != null) {
-                String makh = request.getParameter("makh");
-                String mahang1 = request.getParameter("mahang");
+            String action = request.getParameter("action");
+            String xacnhan = request.getParameter("xacnhan");
+
+            // Them san pham moi            
+            if (action != null && action.equalsIgnoreCase("add")) {
+
+                // Lay thong tin san pham can them vao
+                String mahang = request.getParameter("mahang");
                 String tenhang = request.getParameter("tenhang");
                 double gia = Double.parseDouble(request.getParameter("gia"));
-                int soluong = Integer.parseInt(request.getParameter("soluong"));
+                int soluong = 1;
+
+                // Tao session gio hang
+                HttpSession session = request.getSession(true);
+                // Lay thong tin gio hang hien tai
+                Cart c = (Cart) session.getAttribute("cart");
+                // Neu chua co gio hang <=> c null => tao gio hang moi
+                if (c == null) {
+                    session.setAttribute("cart", new Cart());
+                }
+                c = (Cart) session.getAttribute("cart");
+                // Them san pham moi vao gio hang
+                c.add(new Item(mahang, tenhang, gia, soluong));
+                // Ghi de gia tri lai
+                session.setAttribute("cart", c);
+
+                RequestDispatcher rd = request.getRequestDispatcher("Giohang.jsp");
+                rd.forward(request, response);
+            }
+
+            // Xac nhan mua hang
+            if (xacnhan != null) {
+                request.setAttribute("BuySuccess", "Mua hang thanh cong");
+                RequestDispatcher rd = request.getRequestDispatcher("Muahang.jsp");
+                rd.forward(request, response);
+                /*
+                List<Item> lstItem = new ArrayList<>();
+                
+                // Tao session gio hang
+                HttpSession session = request.getSession(true);
+                // Lay thong tin gio hang hien tai
+                Cart c = (Cart) session.getAttribute("cart");
+                lstItem = c.getItems();
 
                 //Tao ma hoa don (ma hoa don dung chung cho db chi tiet hoa don va db hoa don
                 Random generator = new Random();
                 int mahoadon = generator.nextInt(Integer.MAX_VALUE);
 
-                //ghi vao db chi tiet hoa don
-                p.taoChiTietHoaDon(mahoadon, mahang1, soluong);
+                // Lay thong tin khach hang
+                String khachhang = request.getParameter("khachhang");
 
-                //ghi vao db hoa don
-                String ngaytao = "3/13/2020";
-                p.taoHoaDon(mahoadon, makh, ngaytao);
-                
+                // Ghi vao db hoa don
+                String ngaytao = "3/25/2020";
+                p.taoHoaDon(mahoadon, khachhang, ngaytao);
+
+                // Ghi vao db chi tiet hoa don
+                for (int i = 0; i < lstItem.size(); i++) {
+                    String mahang1 = lstItem.get(i).getMahang();
+                    int soluong1 = lstItem.get(i).getSoluong();
+                    p.taoChiTietHoaDon(mahoadon, mahang1, soluong1);
+                }
+
                 request.setAttribute("BuySuccess", "Mua hang thanh cong");
-                RequestDispatcher rd = request.getRequestDispatcher("Muahang.jsp");
-                rd.forward(request, response);
+                RequestDispatcher rd1 = request.getRequestDispatcher("Muahang.jsp");
+                rd1.forward(request, response);
+                */
             }
-
-            RequestDispatcher rd = request.getRequestDispatcher("Dathang.jsp");
-            rd.forward(request, response);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

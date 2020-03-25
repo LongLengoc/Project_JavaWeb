@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -33,12 +34,26 @@ public class DeleteSanPhamController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try {
+            // Lay thong tin dang nhap
+            HttpSession session = request.getSession();
+            Object obj = session.getAttribute("login");
+
             String mahang = request.getParameter("mahang");
             Product p = new Product();
-            p.delete(mahang);
-            request.setAttribute("DeleteProSuccess", "Xoa san pham thanh cong");
-            RequestDispatcher rd = request.getRequestDispatcher("Themsanpham.jsp");
-            rd.forward(request, response);
+
+            if (obj == null) {
+                // Access denied
+                // Quay lai trang login
+                request.setAttribute("AccessDenied", "Vui long dang nhap de thuc hien chuc nang nay");
+                RequestDispatcher rd = request.getRequestDispatcher("Dangnhap.jsp");
+                rd.forward(request, response);
+            } else {
+                // Xoa mat hang               
+                p.delete(mahang);
+                request.setAttribute("DeleteProSuccess", "Xoa san pham thanh cong");
+                RequestDispatcher rd = request.getRequestDispatcher("Themsanpham.jsp");
+                rd.forward(request, response);
+            }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

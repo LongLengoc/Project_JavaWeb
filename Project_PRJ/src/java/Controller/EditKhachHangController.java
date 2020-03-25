@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -32,15 +33,28 @@ public class EditKhachHangController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try  {
-            Khachhang kh = new Khachhang();
-            if (request.getParameter("selectAll") != null) {
-                
-                // Lay thong tin khach hang tu db roi hien thi
-                request.setAttribute("lstKh", kh.selectAll());
-                
-                RequestDispatcher rd = request.getRequestDispatcher("Hienthikhachhang.jsp");
+        try {
+            // Lay thong tin dang nhap
+            HttpSession session = request.getSession();
+            Object obj = session.getAttribute("login");
+
+            if (obj == null) {
+                // Access denied
+                // Quay lai trang login
+                request.setAttribute("AccessDenied", "Vui long dang nhap de thuc hien chuc nang nay");
+                RequestDispatcher rd = request.getRequestDispatcher("Dangnhap.jsp");
                 rd.forward(request, response);
+            } else {
+                // Access accpeted
+                Khachhang kh = new Khachhang();
+                if (request.getParameter("selectAll") != null) {
+
+                    // Lay thong tin khach hang tu db roi hien thi
+                    request.setAttribute("lstKh", kh.selectAll());
+
+                    RequestDispatcher rd = request.getRequestDispatcher("Hienthikhachhang.jsp");
+                    rd.forward(request, response);
+                }
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

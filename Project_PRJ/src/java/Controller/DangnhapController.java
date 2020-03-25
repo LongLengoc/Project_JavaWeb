@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -33,6 +34,9 @@ public class DangnhapController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try  {
+                   
+            HttpSession session = request.getSession();
+            
             // Lay thong tin tu form
             String username = request.getParameter("username");
             String password = request.getParameter("password");
@@ -42,6 +46,7 @@ public class DangnhapController extends HttpServlet {
                 boolean check = u.checkLogin(username, password);
                 if (check == true) {
                     request.setAttribute("Loginsuccess", "Dang nhap thanh cong");
+                    session.setAttribute("login", "ok");
                     RequestDispatcher rd = request.getRequestDispatcher("Trangchu.jsp");
                     rd.forward(request, response);
                 } else {

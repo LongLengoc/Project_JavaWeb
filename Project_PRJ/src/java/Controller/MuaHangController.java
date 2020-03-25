@@ -41,6 +41,12 @@ public class MuaHangController extends HttpServlet {
                 request.setAttribute("product", pr.getListProduct());
             }
             
+            // Tim kiem thong tin san pham
+            if (request.getParameter("search") != null) {
+                String tenhang = request.getParameter("timkiem");
+                request.setAttribute("lstpro", pr.searchproduct(tenhang));
+            }
+            
             //request.setAttribute("product", pr.getListProduct());
             RequestDispatcher rd = request.getRequestDispatcher("Muahang.jsp");
             rd.forward(request, response);
